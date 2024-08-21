@@ -20,6 +20,8 @@ services:
       - user_todo_api_database
     environment:
       DATABASE_URL: postgresql+psycopg://app_user:app_password@user_todo_api_database:5432/app_db
+    volumes:
+      - ./.env:/app/.env
 
 volumes:
   pgdata:

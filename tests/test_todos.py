@@ -50,6 +50,7 @@ def test_list_todos_pagination_should_return_2_todos(session, user, client, toke
     assert len(response.json()['todos']) == expected_todos
 
 
+# PARAMETRIZE TODO
 def test_list_todos_filter_title_should_return_5_todos(session, user, client, token):
     expected_todos = 5
     session.bulk_save_objects(TodoFactory.create_batch(5, user_id=user.id, title='Test todo 1'))
@@ -63,6 +64,7 @@ def test_list_todos_filter_title_should_return_5_todos(session, user, client, to
     assert len(response.json()['todos']) == expected_todos
 
 
+# PARAMETRIZE TODO
 def test_list_todos_filter_description_should_return_5_todos(session, user, client, token):
     expected_todos = 5
     session.bulk_save_objects(
@@ -78,6 +80,7 @@ def test_list_todos_filter_description_should_return_5_todos(session, user, clie
     assert len(response.json()['todos']) == expected_todos
 
 
+# PARAMETRIZE TODO
 def test_list_todos_filter_state_should_return_5_todos(session, user, client, token):
     expected_todos = 5
     session.bulk_save_objects(TodoFactory.create_batch(5, user_id=user.id, state=TodoState.draft))
