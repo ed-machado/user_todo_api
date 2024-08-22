@@ -6,11 +6,10 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      DATABASE_URL: ${{secrets.DATABASE_URL}}
-      SECRET_KEY: ${{secrets.SECRET_KEY}}
-      ALGORITHM: ${{secrets.ALGORITHM}}
-      ACCESS_TOKEN_EXPIRE_MINUTES: ${{secrets.ACCESS_TOKEN_EXPIRE_MINUTES}}
-
+      DATABASE_URL: "postgresql+psycopg://app_user:app_password@localhost:5432/app_db"
+      SECRET_KEY: "your-secret-key"
+      ALGORITHM:  "HS256"
+      ACCESS_TOKEN_EXPIRE_MINUTES: 30
     steps:
       - name: Copy repo files
         uses: actions/checkout@v3
