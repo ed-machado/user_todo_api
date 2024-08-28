@@ -32,6 +32,16 @@ class TodoFactory(factory.Factory):
 
 
 @pytest.fixture
+def test_context(session, user, client, token):
+    return {
+        'session': session,
+        'user': user,
+        'client': client,
+        'token': token,
+    }
+
+
+@pytest.fixture
 def client(session):
     def get_session_override():
         return session

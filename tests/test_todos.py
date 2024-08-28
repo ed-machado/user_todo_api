@@ -1,5 +1,7 @@
 from http import HTTPStatus
 
+import pytest
+
 from tests.conftest import TodoFactory
 from user_todo_api.models import TodoState
 
@@ -50,77 +52,46 @@ def test_list_todos_pagination_should_return_2_todos(session, user, client, toke
     assert len(response.json()['todos']) == expected_todos
 
 
-# PARAMETRIZE TODO
-def test_list_todos_filter_title_should_return_5_todos(session, user, client, token):
-    expected_todos = 5
-    session.bulk_save_objects(TodoFactory.create_batch(5, user_id=user.id, title='Test todo 1'))
-    session.commit()
+@pytest.mark.parametrize(
+    ('filter_params', 'expected_todos'),
+    [
+        ({'title': 'Test todo 1'}, 5),
+        ({'description': 'desc'}, 5),
+        ({'state': 'draft'}, 5),
+        ({'title': 'Test todo combined', 'description': 'combined', 'state': 'done'}, 5),
+    ],
+)
+def test_list_todos_filters(test_context, filter_params, expected_todos):
+    session = test_context['session']
+    user = test_context['user']
 
-    response = client.get(
-        '/todos/?title=Test todo 1',
-        headers={'Authorization': f'Bearer {token}'},
-    )
-
-    assert len(response.json()['todos']) == expected_todos
-
-
-# PARAMETRIZE TODO
-def test_list_todos_filter_description_should_return_5_todos(session, user, client, token):
-    expected_todos = 5
-    session.bulk_save_objects(
-        TodoFactory.create_batch(5, user_id=user.id, description='description')
-    )
-    session.commit()
-
-    response = client.get(
-        '/todos/?description=desc',
-        headers={'Authorization': f'Bearer {token}'},
-    )
-
-    assert len(response.json()['todos']) == expected_todos
-
-
-# PARAMETRIZE TODO
-def test_list_todos_filter_state_should_return_5_todos(session, user, client, token):
-    expected_todos = 5
-    session.bulk_save_objects(TodoFactory.create_batch(5, user_id=user.id, state=TodoState.draft))
-    session.commit()
-
-    response = client.get(
-        '/todos/?state=draft',
-        headers={'Authorization': f'Bearer {token}'},
-    )
-
-    assert len(response.json()['todos']) == expected_todos
-
-
-# PARAMETRIZE TODO
-def test_list_todos_filter_combined_should_return_5_todos(session, user, client, token):
-    expected_todos = 5
-    session.bulk_save_objects(
-        TodoFactory.create_batch(
-            5,
-            user_id=user.id,
-            title='Test todo combined',
-            description='combined description',
-            state=TodoState.done,
+    if filter_params == {'title': 'Test todo combined', 'description': 'combined', 'state': 'done'}:
+        session.bulk_save_objects(
+            TodoFactory.create_batch(
+                5,
+                user_id=user.id,
+                title='Test todo combined',
+                description='combined description',
+                state=TodoState.done,
+            )
         )
-    )
-
-    session.bulk_save_objects(
-        TodoFactory.create_batch(
-            3,
-            user_id=user.id,
-            title='Other title',
-            description='other description',
-            state=TodoState.todo,
+        session.bulk_save_objects(
+            TodoFactory.create_batch(
+                3,
+                user_id=user.id,
+                title='Other title',
+                description='other description',
+                state=TodoState.todo,
+            )
         )
-    )
+    else:
+        session.bulk_save_objects(TodoFactory.create_batch(5, user_id=user.id, **filter_params))
     session.commit()
 
-    response = client.get(
-        '/todos/?title=Test todo combined&description=combined&state=done',
-        headers={'Authorization': f'Bearer {token}'},
+    query_params = '&'.join([f'{key}={value}' for key, value in filter_params.items()])
+    response = test_context['client'].get(
+        f'/todos/?{query_params}',
+        headers={'Authorization': f'Bearer {test_context["token"]}'},
     )
 
     assert len(response.json()['todos']) == expected_todos
