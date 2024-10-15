@@ -51,8 +51,7 @@ def test_list_todos_pagination_should_return_2_todos(session, user, client, toke
 
     assert len(response.json()['todos']) == expected_todos
 
-
-    @pytest.mark.parametrize(
+@pytest.mark.parametrize(
     ('filter_params', 'expected_todos'),
     [
         ({'title': 'Test todo 1'}, 5),
@@ -61,6 +60,8 @@ def test_list_todos_pagination_should_return_2_todos(session, user, client, toke
         ({'title': 'Test todo combined', 'description': 'combined', 'state': 'done'}, 5),
     ],
 )
+
+    
 def test_list_todos_filters(test_context, filter_params, expected_todos):
     session = test_context['session']
     user = test_context['user']
