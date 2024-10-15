@@ -50,8 +50,7 @@ def test_list_todos_pagination_should_return_2_todos(session, user, client, toke
     )
 
     assert len(response.json()['todos']) == expected_todos
-
-#PARAMETRIZE
+    
 @pytest.mark.parametrize(
     ('filter_params', 'expected_todos'),
     [
